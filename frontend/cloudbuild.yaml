@@ -1,0 +1,22 @@
+# Build with production Nakama endpoint baked in (Vite env at build time).
+# Override: gcloud builds submit . --config=cloudbuild.yaml --substitutions=_NAKAMA_HOST=your-host.run.app
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - asia-south1-docker.pkg.dev/$PROJECT_ID/lila-frontend/lila-web:latest
+      - --build-arg
+      - VITE_NAKAMA_HOST=${_NAKAMA_HOST}
+      - --build-arg
+      - VITE_NAKAMA_PORT=443
+      - --build-arg
+      - VITE_NAKAMA_SERVER_KEY=${_NAKAMA_SERVER_KEY}
+      - --build-arg
+      - VITE_NAKAMA_USE_SSL=true
+      - .
+images:
+  - asia-south1-docker.pkg.dev/$PROJECT_ID/lila-frontend/lila-web:latest
+substitutions:
+  _NAKAMA_HOST: nakama-255488740752.asia-south1.run.app
+  _NAKAMA_SERVER_KEY: defaultkey

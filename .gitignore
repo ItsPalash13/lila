@@ -5,13 +5,23 @@ node_modules/
 frontend/dist/
 nakama/runtime/build/
 
-# Env & local secrets
+# Env & local secrets (any directory)
 .env
 .env.*
 !.env.example
 
-# Logs & OS
+# Tooling / OS
 *.log
 .DS_Store
 Thumbs.db
 .idea/
+.vscode/*
+!.vscode/extensions.json
+.cursor/
+
+# Test / coverage
+coverage/
+
+# Certificates & keys (never commit)
+*.pem
+*.key

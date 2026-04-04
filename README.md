@@ -27,7 +27,7 @@ Server-authoritative tic-tac-toe with React + TypeScript frontend and Nakama 3.x
 | Automatic matchmaking (classic & timed pools) | ✅ |
 | Join by match id + host flow | ✅ |
 | Graceful disconnect / reconnect (forfeit, rejoin hint, resync opcode) | ✅ |
-| **Deployment** (cloud Nakama + public frontend + deployment docs) | ☐ *Not included — see [Deployment](#deployment) below* |
+| **Deployment** (cloud Nakama + public frontend + deployment docs) | ✅ *See [Deployment](#deployment)* |
 
 ### Optional (bonus)
 
@@ -42,11 +42,11 @@ Server-authoritative tic-tac-toe with React + TypeScript frontend and Nakama 3.x
 | Item | Status |
 |------|--------|
 | Source repository | ✅ (this repo) |
-| Public game URL / mobile app | ☐ *Host per [Deployment](#deployment)* |
-| Public Nakama endpoint | ☐ *Host per [Deployment](#deployment)* |
+| Public game URL / mobile app | ✅ [Production frontend](https://lila-frontend-255488740752.asia-south1.run.app) |
+| Public Nakama endpoint | ✅ [Production Nakama API](https://nakama-255488740752.asia-south1.run.app) (HTTPS / WSS) |
 | README: setup & install | ✅ |
 | README: architecture & design | ✅ |
-| README: deployment process | ⚠️ *Outline only — production deploy not performed here* |
+| README: deployment process | ✅ *GCP Cloud Run — [Deployment](#deployment)* |
 | README: API / server configuration | ✅ |
 | README: how to test multiplayer | ✅ |
 
@@ -56,7 +56,8 @@ Server-authoritative tic-tac-toe with React + TypeScript frontend and Nakama 3.x
 
 - **Node.js** 20+ (or compatible) for the frontend and Nakama runtime build  
 - **Docker** + Docker Compose (for Postgres + Nakama locally)  
-- **npm**
+- **npm**  
+- **Google Cloud SDK (`gcloud`)** — only if you redeploy or rebuild production images
 
 ---
 
@@ -137,7 +138,7 @@ flowchart TB
 ```
 
 - **Authoritative match** (`tic_tac_toe` in [`nakama/runtime/src/main.ts`](nakama/runtime/src/main.ts)): holds board, phase, turn, marks, timed deadlines; validates moves in `matchLoop`; sends JSON snapshots on op code **1**; moves on op code **2**; optional resync on op code **3**.  
-- **Client** ([`frontend/src/nakama/NakamaSocketContext.tsx`](frontend/src/nakama/NakamaSocketContext.tsx)): matchmaker or `joinMatch(matchId)`; applies snapshots to React state.  
+- **Client** ([`frontend/src/nakama/NakamaSocketContext.tsx`](frontend/src/nakama/NakamaSocketContext.tsx)): matchmaker or `joinMatch(matchId)`; applies snapshots to React state; `createSocket(client.useSSL)` so an HTTPS-hosted app uses **WSS** (avoids mixed-content blocking).  
 - **Rooms:** `create_tic_room` creates a match; host/guest join by id; quick match uses separate **classic** vs **timed** matchmaker queries.  
 - **Persistence:** leaderboards (`tic_wins`, `tic_losses`, `tic_rating`), storage (`tic_stats` profile, `tic_match_log` history).  
 - **Session:** short JWT + long refresh in [`nakama/local.yml`](nakama/local.yml); client restores session from `localStorage`.
@@ -159,13 +160,42 @@ flowchart TB
 
 ## Deployment
 
-**This repository does not include a finished cloud deployment.** For the assignment deliverable you would typically:
+Production runs on **Google Cloud** (project **`lila-492319`**, region **`asia-south1`**): **Cloud Run** for Nakama and the static web UI, **Cloud SQL for PostgreSQL** for Nakama’s database, **Artifact Registry** for container images, and **Secret Manager** for the database password.
 
-1. **Nakama** — Run Nakama (+ Postgres) on a VM or managed service; set `database.address`, `socket.server_key`, TLS certificates; mount or bake the compiled `nakama/runtime/build/index.js`; expose **7350** (and **7351** for console if needed, restricted).  
-2. **Frontend** — Build static assets (`npm run build`), host on Netlify / Vercel / S3+CloudFront / etc.; set production `VITE_*` to your **public** Nakama URL and enable `VITE_NAKAMA_USE_SSL=true` when using HTTPS.  
-3. **CORS / security** — Configure Nakama allowed origins; never expose the master console key in the client; use a **socket** key appropriate for game clients.
+### Live URLs
 
-Document your actual URLs, env vars, and any reverse proxy (e.g. nginx) in a short `DEPLOY.md` or extend this README once deployed.
+| Service | URL |
+|--------|-----|
+| **Web app** (nginx + Vite build) | https://lila-frontend-255488740752.asia-south1.run.app |
+| **Nakama** (API + WebSocket, TLS terminated by Cloud Run) | https://nakama-255488740752.asia-south1.run.app |
+
+The browser client is built with **`VITE_NAKAMA_USE_SSL=true`**, **`VITE_NAKAMA_PORT=443`**, and the public Nakama hostname so traffic stays on **HTTPS / WSS**. The dev server key baked into that build is **`defaultkey`** (change Nakama’s key and rebuild the frontend if you lock this down).
+
+### What runs where
+
+1. **Nakama** — Custom image from [`nakama/Dockerfile`](nakama/Dockerfile) (TypeScript runtime compiled in the image). Cloud Run listens on container port **7350**. [`nakama/docker-entrypoint.sh`](nakama/docker-entrypoint.sh) runs migrations then starts Nakama; with **`CLOUDSQL_CONNECTION_NAME`** + **`POSTGRES_PASSWORD`** (from Secret Manager) it uses the Cloud SQL **Unix socket** (`/cloudsql/...`). **`min-instances: 1`** avoids dropping active sockets to zero scale.  
+2. **Frontend** — Image from [`frontend/Dockerfile`](frontend/Dockerfile): `npm run build` then **nginx** on port **80**. [`frontend/cloudbuild.yaml`](frontend/cloudbuild.yaml) passes **`VITE_*`** build-args so the Nakama host/port/SSL match production.  
+3. **Database** — Cloud SQL instance **`lila-nakama-db`**, database name **`nakama`**, attached to the Nakama revision via the Cloud Run **Cloud SQL connection** setting.
+
+### Redeploy (from a machine with `gcloud` and project access)
+
+```powershell
+cd nakama
+.\deploy-cloud-run.ps1
+```
+
+```powershell
+cd frontend
+.\deploy-cloud-run.ps1
+```
+
+Scripts default to project **`lila-492319`**, region **`asia-south1`**, and the Artifact Registry paths under `asia-south1-docker.pkg.dev/lila-492319/...`. Override with script parameters if you fork to another project or region. Nakama deploy expects Secret **`lila-nakama-postgres`** and IAM on the runtime service account (**Cloud SQL Client** + **Secret Accessor** on that secret).
+
+### Security notes
+
+- Do **not** commit **`.env`** files; local secrets stay local ([`nakama/.env.example`](nakama/.env.example) is a template only).  
+- Treat **`defaultkey`** as public in the browser; for a serious production game, rotate Nakama’s server key and rebuild the frontend with matching **`VITE_NAKAMA_SERVER_KEY`**.  
+- Restrict Nakama **7351** (console) in production if you expose it; the current public service is **7350**-only from the client’s perspective.
 
 ---
 
@@ -190,6 +220,9 @@ Document your actual URLs, env vars, and any reverse proxy (e.g. nginx) in a sho
 | [`nakama/runtime/src/main.ts`](nakama/runtime/src/main.ts) | Match logic, RPCs, leaderboards |
 | [`nakama/docker-compose.yml`](nakama/docker-compose.yml) | Local Postgres + Nakama |
 | [`nakama/local.yml`](nakama/local.yml) | Nakama config (session, matchmaker, runtime path) |
+| [`nakama/deploy-cloud-run.ps1`](nakama/deploy-cloud-run.ps1) | Build/push + Cloud Run deploy for Nakama |
+| [`frontend/cloudbuild.yaml`](frontend/cloudbuild.yaml) | Cloud Build: Docker build with production `VITE_*` |
+| [`frontend/deploy-cloud-run.ps1`](frontend/deploy-cloud-run.ps1) | Cloud Build + Cloud Run deploy for the web app |
 
 ---
 

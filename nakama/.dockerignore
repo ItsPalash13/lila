@@ -1,4 +1,6 @@
 runtime/node_modules
-runtime/build
 .git
+.env
+.env.*
 *.md
+*.ps1

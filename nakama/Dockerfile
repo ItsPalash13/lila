@@ -1,10 +1,8 @@
 # Compile TypeScript match runtime → single bundle for Nakama JS entrypoint.
-FROM node:20-bookworm-slim AS runtime-build
+# nakama-runtime is installed from a GitHub tarball (no git binary needed in the image).
+FROM node:20-alpine AS runtime-build
 
 WORKDIR /build
-
-RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates \
-  && rm -rf /var/lib/apt/lists/*
 
 COPY runtime/package.json runtime/package-lock.json ./
 RUN npm ci
@@ -24,7 +22,6 @@ RUN chmod +x /nakama/docker-entrypoint.sh
 
 EXPOSE 7350 7351
 
-ENV NAKAMA_DATABASE_ADDRESS=postgres:localdb@postgres:5432/nakama
 ENV NAKAMA_NODE_NAME=nakama1
 
 ENTRYPOINT ["/nakama/docker-entrypoint.sh"]

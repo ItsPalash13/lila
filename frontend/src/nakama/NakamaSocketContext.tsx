@@ -134,7 +134,7 @@ export function NakamaSocketProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const socket = client.createSocket();
+    const socket = client.createSocket(client.useSSL);
     socketRef.current = socket;
 
     socket.onmatchdata = (md) => {
