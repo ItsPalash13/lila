@@ -1,0 +1,263 @@
+.tic-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 320px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.tic-panel--screen {
+  max-width: 400px;
+  flex: 1;
+  padding: 24px 20px 40px;
+  justify-content: flex-start;
+}
+
+.tic-panel__lobby {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-height: min(52vh, 440px);
+}
+
+.tic-panel__lobby-back {
+  align-self: flex-start;
+  margin-bottom: 8px;
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.tic-panel__lobby-back:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tic-panel__lobby-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 16px 0 32px;
+}
+
+.tic-panel__lobby-hint {
+  margin: 0;
+  max-width: 280px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.45;
+  text-align: center;
+}
+
+.tic-panel__status {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.tic-panel__mark {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-h);
+}
+
+.tic-panel__mode {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.tic-panel__opponent {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.tic-panel__countdown {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-h);
+}
+
+.tic-panel__room-id {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.tic-panel__room-id-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.tic-panel__room-id-value {
+  font-family: var(--mono);
+  font-size: 12px;
+  word-break: break-all;
+  text-align: left;
+  flex: 1 1 100%;
+  margin: 0;
+  color: var(--text-h);
+}
+
+.tic-panel__room-id-copy {
+  font-size: 13px !important;
+  padding: 8px 14px !important;
+}
+
+.tic-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.tic-panel__actions button {
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.tic-panel__actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tic-panel__actions button:not(:disabled):hover {
+  border-color: var(--accent-border);
+}
+
+.tic-panel__play-again {
+  background: var(--accent) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+}
+
+/**
+ * Board size is driven only by breakpoint (React data-bp) + viewport math on xs,
+ * not by sibling text reflow inside the panel.
+ */
+.tic-board-wrap {
+  flex-shrink: 0;
+  align-self: center;
+  width: var(--tic-board-size);
+  height: var(--tic-board-size);
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+.tic-board-wrap[data-bp="xs"] {
+  --tic-board-size: min(300px, calc(100vw - 32px));
+}
+
+.tic-board-wrap[data-bp="sm"] {
+  --tic-board-size: 288px;
+}
+
+.tic-board-wrap[data-bp="md"] {
+  --tic-board-size: 312px;
+}
+
+.tic-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: var(--tic-board-gap, 8px);
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.tic-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: clamp(1.25rem, calc(var(--tic-board-size, 288px) * 0.18), 2.25rem);
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  color: var(--text-h);
+  cursor: pointer;
+  min-height: 0;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.tic-cell:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.tic-cell:not(:disabled):hover {
+  border-color: var(--accent);
+}
+
+.tic-panel__result {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.tic-panel__dismiss {
+  margin-left: 6px;
+  font: inherit;
+  font-size: 13px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media (max-width: 479px) {
+  .tic-panel--screen {
+    padding: 20px 16px 36px;
+  }
+
+  .tic-panel__actions button {
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .home-play-cta {
+    min-height: 52px !important;
+  }
+}

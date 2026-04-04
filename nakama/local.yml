@@ -1,0 +1,19 @@
+logger:
+  level: INFO
+
+# Session JWT vs refresh token — see:
+# https://heroiclabs.com/docs/nakama/concepts/session/management/
+# Short access token + long refresh token: client refreshes before expiry (nakama-js
+# uses expiredTimespanMs, default 5m) so players stay signed in up to refresh lifetime.
+session:
+  token_expiry_sec: 300
+  refresh_token_expiry_sec: 604800
+
+# Default matchmaker.interval_sec is 15s; lower it locally so pairs form soon after
+# both clients call addMatchmaker (still requires two tickets in the pool).
+matchmaker:
+  interval_sec: 2
+
+runtime:
+  path: "/nakama/data/modules"
+  js_entrypoint: "build/index.js"

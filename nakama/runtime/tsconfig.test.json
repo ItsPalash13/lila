@@ -1,0 +1,20 @@
+{
+    "compilerOptions":  {
+                            "target":  "ES2015",
+                            "module":  "none",
+                            "lib":  [
+                                        "ES2015"
+                                    ],
+                            "outFile":  "./build/index.js",
+                            "rootDir":  "./src",
+                            "strict":  true,
+                            "noEmitOnError":  true,
+                            "skipLibCheck":  true,
+                            "types":  [
+                                          "nakama-runtime"
+                                      ]
+                        },
+    "include":  [
+                    "src/main.ts"
+                ]
+}

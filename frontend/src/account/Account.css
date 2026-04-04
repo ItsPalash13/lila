@@ -1,0 +1,135 @@
+.account-editor {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 20px 32px;
+  text-align: left;
+}
+
+.account-editor__title {
+  text-align: center;
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: var(--text-h);
+}
+
+.account-editor__subtitle {
+  text-align: center;
+  margin: 0 0 24px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 145%;
+}
+
+.account-editor__preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+}
+
+.account-editor__preview-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent-border);
+  background: var(--bg);
+}
+
+.account-editor__preview-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-editor__preview-name {
+  font-weight: 500;
+  color: var(--text-h);
+  font-size: 17px;
+  margin: 0 0 4px;
+}
+
+.account-editor__preview-sub {
+  font-size: 13px;
+  color: var(--text);
+  margin: 0;
+  word-break: break-all;
+}
+
+.account-editor__section-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  margin: 0 0 10px;
+}
+
+.account-editor__avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.account-editor__avatar-btn {
+  position: relative;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  cursor: pointer;
+  background: var(--bg);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.account-editor__avatar-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.account-editor__avatar-btn:hover {
+  border-color: var(--accent-border);
+}
+
+.account-editor__avatar-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.account-editor__avatar-btn--selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.account-editor__custom-url {
+  margin-bottom: 20px;
+}
+
+.account-editor__success {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: var(--text-h);
+}
+
+.account-editor__wallet {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  word-break: break-all;
+}

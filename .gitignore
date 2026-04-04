@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+frontend/dist/
+nakama/runtime/build/
+
+# Env & local secrets
+.env
+.env.*
+!.env.example
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
+.idea/

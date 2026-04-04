@@ -1,0 +1,39 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:12.2-alpine
+    environment:
+      - POSTGRES_DB=nakama
+      - POSTGRES_PASSWORD=localdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d nakama"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  nakama:
+    container_name: nakama
+    image: heroiclabs/nakama:3.38.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./local.yml:/nakama/data/local.yml:ro
+      - ./runtime:/nakama/data/modules:ro
+    entrypoint:
+      - "/bin/sh"
+      - "-ecx"
+      - |
+        /nakama/nakama migrate up --database.address postgres:localdb@postgres:5432/nakama &&
+        exec /nakama/nakama --name nakama1 --database.address postgres:localdb@postgres:5432/nakama --config /nakama/data/local.yml
+    ports:
+      - "7350:7350"
+      - "7351:7351"
+
+volumes:
+  data:
