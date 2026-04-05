@@ -2,6 +2,13 @@
 
 Server-authoritative tic-tac-toe with React + TypeScript frontend and Nakama 3.x (JavaScript runtime). This repo maps to the **LILA full-stack assignment** rubric below.
 
+## Demo
+
+
+https://github.com/user-attachments/assets/374145cb-ebed-470a-aa73-53e254f64d40
+
+
+
 ---
 
 ## Assignment checklist
